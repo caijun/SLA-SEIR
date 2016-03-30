@@ -6,8 +6,6 @@ source("PF-subroutines.R")
 # Data set
 # --------
 data <- read.table("Google-CDC-US-Feb2010.txt", header = TRUE)
-# tickind <- trunc(seq(1, 36, length = 4))
-# ticklab <- c("9/28/03", "12/14/03", "3/7/04", "5/30/04")
 y <- data[1:36, 5] # y is ILI percentage (%) of 2003-04 season
 
 # Prior hyperparameters
@@ -43,7 +41,6 @@ ticklab <- c("10/5/03", "12/21/03", "3/7/04", "5/30/04")
 
 # Figure 5 of Dukic, Lopes and Polson (2012)
 pdf(file = "Figure5.pdf", width = 20, height = 10)
-
 par(mar = c(5, 5, 4, 3), cex.lab = 3, cex.axis = 1.6, cex.main = 2.5,
     mfrow = c(2, 4))
 
