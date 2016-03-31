@@ -57,8 +57,6 @@ phi <- rnorm(M, q0[2], sqrt(W * Q0[2, 2]))
 g0 <- rnorm(M, m0, sqrt(C0))
 ssm1 <- ar1plusnoise(y1, y1I, q0, Q0, a0, b0, c0, d0, mu, phi, V, W, g0)
 ssm2 <- ar1plusnoise(y2, y2I, q0, Q0, a0, b0, c0, d0, mu, phi, V, W, g0)
-# ssm1 <- ar1plusnoise(y1, y1I, q0, Q0, c0, d0, a0, b0, mu, phi, V, W, g0)
-# ssm2 <- ar1plusnoise(y2, y2I, q0, Q0, c0, d0, a0, b0, mu, phi, V, W, g0)
 loglike.ssm1 <- ssm1$loglike
 loglike.ssm2 <- ssm2$loglike
 pred.ssm1 <- ssm1$pred

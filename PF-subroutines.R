@@ -237,74 +237,86 @@ PF1 <- function(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a) {
   return(list(qs = qs, loglike = loglike, pred = pred))
 }
 
-ar1plusnoise <- function(y, yI, q0, Q0, a0, b0, c0, d0, alpha, beta, V, W, g0) {
+ar1plusnoise <- function(y, yI, q0, Q0, a0, b0, c0, d0, mu, phi, V, W, g0) {
   y <- y / 100
   n <- length(yI)
   M <- length(g0)
   qs <- array(0, c(n, 6, 3))
-  s <- matrix(0, M, 9) # sufficient statisitics
-  s[, 1] <- 1.0 / Q0[1, 1] # Q_t^{-1}
+  s <- matrix(0, M, 3) # sufficient statisitics
+  s[, 1] <- 1.0 / Q0[1, 1] # Q_t^{-1}, inverse of Q_t
   s[, 2] <- 0.0
   s[, 3] <- 1.0 / Q0[2, 2]
-  s[, 4] <- q0[1] / Q0[1, 1] # Q_t^{-1}q_t = q_t / Q_t
-  s[, 5] <- q0[2] / Q0[2, 2]
-  s[, 6] <- c0 # c_t
-  s[, 7] <- d0 # d_t
-  s[, 8] <- a0 # a_t
-  s[, 9] <- b0 # b_t
-  qt1 <- rep(q0[1], M) # q_t, namely q_t = (mu, phi)
-  qt2 <- rep(q0[2], M)
+  # invQ_t <- aperm(replicate(M, solve(Q0)), c(3, 1, 2)) # Q_t^{-1}, inverse of Q_t
+  # Qq_t <- t(replicate(M, solve(Q0, q0))) # Q_t^{-1}q_t = inverse(Q_t) * q_t
+  Qq_t <- t(replicate(M, q0 / diag(Q0)))
+  a_t <- rep(a0, M) # a_t
+  b_t <- rep(b0, M) # b_t
+  c_t <- rep(c0, M) # c_t
+  d_t <- rep(d0, M) # d_t
+  q_t <- t(replicate(M, q0)) # q_t, namely q_t = (mu, phi)
+  g_t <- g0
   I <- rep(y[1], M)
   loglike <- rep(0, n)
   pred <- matrix(0, n, M)
   for (t in 1:n) {
     print(t)
-    g1 <- alpha + beta * g0 # g_t = mu + phi * g_{t-1}
-    pred[t, ] <- I * (1 + g1)
-    w <- dnorm(yI[t], g1, sqrt(V + W))
+    g_t1 <- mu + phi * g_t # g_t = mu + phi * g_{t-1}
+    pred[t, ] <- I * (1 + g_t1)
+    w <- dnorm(yI[t], g_t1, sqrt(V + W))
     loglike[t] <- log(mean(w / y[t]))
     k <- sample(1:M, size = M, replace = TRUE, prob = w)
     w <- w[k]
-    g0o <- g0[k]
-    g1 <- g1[k]
-    alpha <- alpha[k]
-    beta <- beta[k]
+    so  <- s[k, ]
+    g_t0 <- g_t[k]
+    g_t1 <- g_t1[k]
+    a_t0 <- a_t[k]
+    b_t0 <- b_t[k]
+    c_t0 <- c_t[k]
+    d_t0 <- d_t[k]
+    # invQ_t0 <- invQ_t[k, , ]
+    Qq_t0 <- Qq_t[k, ]
+    q_t0 <- q_t[k, ]
+    mu <- mu[k]
+    phi <- phi[k]
     W <- W[k]
     V <- V[k]
-    so  <- s[k, ]
-    qt1o <- qt1[k]
-    qt2o <- qt2[k]
-    var  <- 1 / (1 / V + 1 / W)
-    mean <- var * (yI[t] / V + g1 / W)
-    sd <- sqrt(var)
-    g0 <- rnorm(M, mean, sd) # (g_t|s_t^k, epison) ~ N(m_t, C_t)
+    C_t  <- 1 / (1 / V + 1 / W)
+    m_t <- C_t * (yI[t] / V + g_t1 / W)
+    g_t <- rnorm(M, m_t, sqrt(C_t)) # (g_t|s_t^k, epison) ~ N(m_t, C_t)
+    x_t <- cbind(1, g_t0)
     s[, 1] <- so[, 1] + 1
-    s[, 2] <- so[, 2] + g0o
-    s[, 3] <- so[, 3] + g0o ^ 2
-    s[, 4] <- so[, 4] + g0
-    s[, 5] <- so[, 5] + g0 * g0o
-    s[, 6] <- so[, 6] + 1 / 2 # c_t = c_{t-1} + 1/2
+    s[, 2] <- so[, 2] + g_t0
+    s[, 3] <- so[, 3] + g_t0 ^ 2
+    # invQ_t <- invQ_t0 + plyr::aaply(x_t, 1, function(x) x %*% t(x) )
+    Qq_t <- Qq_t0 + g_t * x_t
     m <- s[, 1] * s[, 3] - s[, 2] ^ 2 # determinant of Q_t^{-1}
-    qt1 <- (s[, 3] * s[, 4] - s[, 2] * s[, 5]) / m
-    qt2 <- (s[, 1] * s[, 5] - s[, 2] * s[, 4]) / m
+    # m <- apply(invQ_t, 1, det) # determinant of Q_t^{-1}
+    q_t[, 1] <- (s[, 3] * Qq_t[, 1] - s[, 2] * Qq_t[, 2]) / m
+    # q_t[, 1] <- (invQ_t[, 2, 2] * Qq_t[, 1] - invQ_t[, 1, 2] * Qq_t[, 2]) / m
+    q_t[, 2] <- (s[, 1] * Qq_t[, 2] - s[, 2] * Qq_t[, 1]) / m
+    # q_t[, 2] <- (invQ_t[, 1, 1] * Qq_t[, 2] - invQ_t[, 1, 2] * Qq_t[, 1]) / m
+    c_t <- c_t0 + 1 / 2 # c_t = c_{t-1} + 1/2
     # y_t is replaced by g_t to avoid NA
-    s[, 7] <- so[, 7] + (g0 - qt1 - qt2 * g0o) * g0 / 2 + 
-      ((qt1o - qt1) * so[, 4] + (qt2o - qt2) * so[, 5]) / 2 # d_t = d_{t-1} + ...
-    s[, 8] <- so[, 8] + 1 / 2 # a_t = a_{t-1} + 1/2
-    s[, 9] <- so[, 9] + (yI[t] - g0) ^ 2 / 2 # b_t = b_{t-1} + (y_t - g_t)^2 / 2
-    W <- 1 / rgamma(M, s[, 6], s[, 7]) # (W|g^t, X^t) ~ IG(c_t, d_t)
+    d_t <- d_t0 + (g_t - q_t[, 1] - q_t[, 2] * g_t0) * g_t / 2 + 
+      rowMeans((q_t0 - q_t) * Qq_t0) # d_t = d_{t-1} + ...
+    W <- 1 / rgamma(M, c_t, d_t) # (W|g^t, X^t) ~ IG(c_t, d_t)
+    a_t <- a_t0 + 1 / 2 # a_t = a_{t-1} + 1/2
+    b_t <- b_t0 + (yI[t] - g_t) ^ 2 / 2 # b_t = b_{t-1} + (y_t - g_t)^2 / 2
+    V <- 1 / rgamma(M, a_t, b_t) # (V|y^t, g^t) ~ IG(a_t, b_t)
     std <- sqrt(W / m)
     norm <- cbind(rnorm(M, 0, std), rnorm(M, 0, std))
-    alpha <- qt1 + sqrt(s[, 3]) * norm[, 1]
-    beta <- qt2 - s[, 2] / sqrt(s[, 3]) * norm[, 1] + 
+    mu <- q_t[, 1] + sqrt(s[, 3]) * norm[, 1]
+    # mu <- q_t[, 1] + sqrt(invQ_t[, 2, 2]) * norm[, 1]
+    phi <- q_t[, 2] - s[, 2] / sqrt(s[, 3]) * norm[, 1] +
       sqrt(s[, 1] - s[, 2] ^ 2 / s[, 3]) * norm[, 2]
-    V <- 1 / rgamma(M, s[, 8], s[, 9]) # (V|y^t, g^t) ~ IG(a_t, b_t)
-    I <- I * (1 + g0)
-    qs[t, 1, ] <- quantile(alpha, c(.05, .5, .95))
-    qs[t, 2, ] <- quantile(beta, c(.05, .5, .95))
+    # phi <- q_t[, 2] - invQ_t[, 1, 2] / sqrt(invQ_t[, 2, 2]) * norm[, 1] + 
+    #   sqrt(invQ_t[, 1, 1] - invQ_t[, 1, 2] * invQ_t[, 2, 1] / invQ_t[, 2, 2]) * norm[, 2]
+    I <- I * (1 + g_t)
+    qs[t, 1, ] <- quantile(mu, c(.05, .5, .95))
+    qs[t, 2, ] <- quantile(phi, c(.05, .5, .95))
     qs[t, 3, ] <- quantile(W, c(.05, .5, .95))
     qs[t, 4, ] <- quantile(V, c(.05, .5, .95))
-    qs[t, 5, ] <- quantile(g0, c(.05, .5, .95))
+    qs[t, 5, ] <- quantile(g_t, c(.05, .5, .95))
     qs[t, 6, ] <- quantile(I, c(.05, .5, .95))
   }
   return(list(qs = qs, loglike = loglike, pred = pred))
