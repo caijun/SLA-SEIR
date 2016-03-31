@@ -28,9 +28,13 @@ a <- 0.99 # Liu-West shrinkage factor
 set.seed(1321654)
 n <- length(y)
 yI <- diff(y) / y[1:(n - 1)] # the observed growth rate of the infectious population
-qs <- PF(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a)
-loglike1 <- PFlike(y, yI, 2, 1.25, 1, a0, b0, c0, d0, M)
-loglike2 <- PFlike(y, yI, 2, 2.20, 1, a0, b0, c0, d0, M)
+qs <- PF(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a)$qs
+# loglike1 <- PFlike(y, yI, 2, 1.25, 1, a0, b0, c0, d0, M)
+# loglike2 <- PFlike(y, yI, 2, 2.20, 1, a0, b0, c0, d0, M)
+# The log Bayes factor calculated by PF is more reasonable than PFlike that is 
+# used in  Dukic, Lopes and Polson (2012).
+loglike1 <- PF(y, yI, a0, b0, c0, d0, 2, sda, 1.25, sdb, 1, sdg, M, a)$loglike
+loglike2 <- PF(y, yI, a0, b0, c0, d0, 2, sda, 2.20, sdb, 1, sdg, M, a)$loglike
 clbf <- cumsum(loglike1 - loglike2) # cummulative log Bayesian Factor
 
 names <- c("Transmission", "Latency", "Recovery", "Obs St Dev", "Evo St Dev")

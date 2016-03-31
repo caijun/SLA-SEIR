@@ -95,7 +95,7 @@ PF <- function(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a, ahead = 0
     qs[9, , t] <- quantile(sqrt(sig_y2), c(.05, .5, .95))
     qs[10, , t] <- quantile(g_t, c(.05, .5, .95))
   }
-  if (ahead == 0) return(qs)
+  if (ahead == 0) return(list(qs = qs, loglike = loglike))
   if (ahead == 1) return(list(qs = qs, loglike = loglike, pred = pred))
 }
 
