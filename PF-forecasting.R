@@ -73,8 +73,8 @@ cs.pf2 <- cumsum(loglike.pf2)
 
 mpred.pf1 <- t(apply(pred.pf1, 2, quantile, c(.05, .5, .95)))
 mpred.pf2 <- t(apply(pred.pf2, 2, quantile, c(.05, .5, .95)))
-mpred.ssm1 <- t(apply(pred.ssm1, 1, quantile, c(.05, .5, .95)))
-mpred.ssm2 <- t(apply(pred.ssm2, 1, quantile, c(.05, .5, .95)))
+mpred.ssm1 <- t(apply(pred.ssm1, 2, quantile, c(.05, .5, .95)))
+mpred.ssm2 <- t(apply(pred.ssm2, 2, quantile, c(.05, .5, .95)))
 rmse1 <- var(y1[1:n1] - 100 * mpred.ssm1[, 2]) / var(y1[1:n1] - 100 * mpred.pf1[, 2])
 rmse2 <- var(y2[1:n2] - 100 * mpred.ssm2[, 2]) / var(y2[1:n2] - 100 * mpred.pf2[, 2])
 
