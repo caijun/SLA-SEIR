@@ -28,7 +28,9 @@ a <- 0.99 # Liu-West shrinkage factor
 set.seed(1321654)
 n <- length(y)
 yI <- diff(y) / y[1:(n - 1)] # the observed growth rate of the infectious population
-qs <- PF(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a)
+# qs <- PF(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a)
+pf1 <- PF1(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a)
+qs <- pf1$qs
 loglike1 <- PFlike(y, yI, 2, 1.25, 1, a0, b0, c0, d0, M)
 loglike2 <- PFlike(y, yI, 2, 2.20, 1, a0, b0, c0, d0, M)
 clbf <- cumsum(loglike1 - loglike2) # cummulative log Bayesian Factor

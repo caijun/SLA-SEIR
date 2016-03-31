@@ -90,57 +90,8 @@ PF <- function(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a) {
   return(qs)
 }
 
-PFlike <- function(y, yI, alpha, beta, gamma, a0, b0, c0, d0, M) {
-  y <- y / 100
-  n <- length(yI)
-  sig_g2 <- 1 / rgamma(M, a0, b0)
-  sig_y2 <- 1 / rgamma(M, c0, d0)
-  S_t <- rep(1 - y[1], M)
-  E_t <- rep(0, M)
-  I_t <- rep(y[1], M)
-  R_t <- rep(0, M)
-  b0_t <- rep(b0, M)
-  d0_t <- rep(d0, M)
-  loglike <- rep(0, n)
-  for (t in 1:n) {
-    print(t)
-    # Resample (S, E, I, R)
-    mu_g <- -gamma + alpha * E_t / I_t
-    w <- dnorm(yI[t], mu_g, sqrt(sig_g2 + sig_y2), log = TRUE)
-    # loglike[t] <- log(mean(exp(w)))
-    # original formula, y_t is reduced when calculate log Bayes factor
-    loglike[t] <- log(mean(exp(w) / y[t])) 
-    w1 <- exp(w - max(w))
-    k <- sample(1:M, size = M, replace = TRUE, prob = w1)
-    sig_g2 <- sig_g2[k]
-    sig_y2 <- sig_y2[k]
-    S_t0 <- S_t[k]
-    E_t0 <- E_t[k]
-    I_t0 <- I_t[k]
-    R_t0 <- R_t[k]
-    b0_t0 <- b0_t[k]
-    d0_t0 <- d0_t[k]
-    # Update I
-    mu_g <- mu_g[k]
-    B <- 1 / (1 / sig_g2 + 1 / sig_y2)
-    b <- B * (yI[t] / sig_g2 + mu_g / sig_y2)
-    g_t <- rnorm(M, b, sqrt(B))
-    I_t <- I_t0 * (1 + g_t)
-    # Update (E, R, S)
-    E_t <- beta * I_t0 * S_t0 + (1 - alpha) * E_t0
-    R_t <- R_t0 + gamma * I_t0
-    S_t <- 1 - I_t - R_t - E_t
-    # Offline sampling fixed parameters
-    b0_t <- b0_t0 + (yI[t] - g_t) ^ 2 / 2
-    sig_g2 <- 1 / rgamma(M, a0 + t / 2, b0_t)
-    d0_t <- d0_t0 + (g_t - mu_g) ^ 2 / 2
-    sig_y2 <- 1 / rgamma(M, c0 + t / 2, d0_t)
-  }
-  return(loglike)
-}
-
-# one step ahead forecast
-PF1 <- function(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a) {
+# ahead = 1, one step ahead forecast
+PF <- function(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a, ahead = 0) {
   y <- y / 100
   n <- length(yI)
   # a is the Liu-West shrinage factor
@@ -163,12 +114,12 @@ PF1 <- function(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a) {
   loglike <- rep(0, n)
   pred <- matrix(0, M, n) # predictions of the infected
   for (t in 1:n) {
-    print(t)
     pred[, t] <- (1 - pars[, 3]) * I_t + pars[, 1] * E_t
     mu_g <- -pars[, 3] + pars[, 1] * E_t / I_t
     w <- dnorm(yI[t], mu_g, sqrt(sig_g2 + sig_y2), log = TRUE) # probabilities p are given as log(p)
     loglike[t] <- log(mean(exp(w) / y[t]))
     ### same code from PF function ###
+    print(t)
     m_psi <- apply(lpars, 2, mean)
     V_psi <- var(lpars)
     lpars <- a * lpars + (1 - a) * matrix(m_psi, M, 3, byrow = TRUE) # a is eta
@@ -231,7 +182,57 @@ PF1 <- function(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a) {
     qs[9, , t] <- quantile(sqrt(sig_y2), c(.05, .5, .95))
     qs[10, , t] <- quantile(g_t, c(.05, .5, .95))
   }
-  return(list(qs = qs, loglike = loglike, pred = pred))
+  if (ahead == 0) return(qs)
+  if (ahead == 1) return(list(qs = qs, loglike = loglike, pred = pred))
+}
+
+PFlike <- function(y, yI, alpha, beta, gamma, a0, b0, c0, d0, M) {
+  y <- y / 100
+  n <- length(yI)
+  sig_g2 <- 1 / rgamma(M, a0, b0)
+  sig_y2 <- 1 / rgamma(M, c0, d0)
+  S_t <- rep(1 - y[1], M)
+  E_t <- rep(0, M)
+  I_t <- rep(y[1], M)
+  R_t <- rep(0, M)
+  b0_t <- rep(b0, M)
+  d0_t <- rep(d0, M)
+  loglike <- rep(0, n)
+  for (t in 1:n) {
+    print(t)
+    # Resample (S, E, I, R)
+    mu_g <- -gamma + alpha * E_t / I_t
+    w <- dnorm(yI[t], mu_g, sqrt(sig_g2 + sig_y2), log = TRUE)
+    # loglike[t] <- log(mean(exp(w)))
+    # original formula, y_t is reduced when calculate log Bayes factor
+    loglike[t] <- log(mean(exp(w) / y[t])) 
+    w1 <- exp(w - max(w))
+    k <- sample(1:M, size = M, replace = TRUE, prob = w1)
+    sig_g2 <- sig_g2[k]
+    sig_y2 <- sig_y2[k]
+    S_t0 <- S_t[k]
+    E_t0 <- E_t[k]
+    I_t0 <- I_t[k]
+    R_t0 <- R_t[k]
+    b0_t0 <- b0_t[k]
+    d0_t0 <- d0_t[k]
+    # Update I
+    mu_g <- mu_g[k]
+    B <- 1 / (1 / sig_g2 + 1 / sig_y2)
+    b <- B * (yI[t] / sig_g2 + mu_g / sig_y2)
+    g_t <- rnorm(M, b, sqrt(B))
+    I_t <- I_t0 * (1 + g_t)
+    # Update (E, R, S)
+    E_t <- beta * I_t0 * S_t0 + (1 - alpha) * E_t0
+    R_t <- R_t0 + gamma * I_t0
+    S_t <- 1 - I_t - R_t - E_t
+    # Offline sampling fixed parameters
+    b0_t <- b0_t0 + (yI[t] - g_t) ^ 2 / 2
+    sig_g2 <- 1 / rgamma(M, a0 + t / 2, b0_t)
+    d0_t <- d0_t0 + (g_t - mu_g) ^ 2 / 2
+    sig_y2 <- 1 / rgamma(M, c0 + t / 2, d0_t)
+  }
+  return(loglike)
 }
 
 ar1plusnoise <- function(y, yI, q0, Q0, a0, b0, c0, d0, mu, phi, V, W, g0) {
