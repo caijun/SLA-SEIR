@@ -30,8 +30,8 @@ y1I <- diff(y1) / y1[1:(n1 - 1)]
 y2I <- diff(y2) / y2[1:(n2 - 1)]
 n1 <- n1 - 1
 n2 <- n2 - 1
-pf1 <- PF1(y1, y1I, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a)
-pf2 <- PF1(y2, y2I, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a)
+pf1 <- PF(y1, y1I, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a, ahead = 1)
+pf2 <- PF(y2, y2I, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a, ahead = 1)
 loglike.pf1 <- pf1$loglike
 loglike.pf2 <- pf2$loglike
 pred.pf1 <- pf1$pred
