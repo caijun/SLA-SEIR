@@ -93,46 +93,48 @@ PF <- function(y, yI, a0, b0, c0, d0, ma, sda, mb, sdb, mg, sdg, M, a) {
 PFlike <- function(y, yI, alpha, beta, gamma, a0, b0, c0, d0, M) {
   y <- y / 100
   n <- length(yI)
-  sig2 <- 1 / rgamma(M, a0, b0)
-  tau2 <- 1 / rgamma(M, c0, d0)
-  S <- rep(1 - y[1], M)
-  E <- rep(0, M)
-  I <- rep(y[1], M)
-  R <- rep(0, M)
-  ss <- rep(b0, M)
-  vv <- rep(d0, M)
+  sig_g2 <- 1 / rgamma(M, a0, b0)
+  sig_y2 <- 1 / rgamma(M, c0, d0)
+  S_t <- rep(1 - y[1], M)
+  E_t <- rep(0, M)
+  I_t <- rep(y[1], M)
+  R_t <- rep(0, M)
+  b0_t <- rep(b0, M)
+  d0_t <- rep(d0, M)
   loglike <- rep(0, n)
   for (t in 1:n) {
     print(t)
     # Resample (S, E, I, R)
-    g <- -gamma + alpha * E / I
-    w <- dnorm(yI[t], g, sqrt(sig2 + tau2), log = TRUE)
-    loglike[t] <- log(mean(exp(w)))
+    mu_g <- -gamma + alpha * E_t / I_t
+    w <- dnorm(yI[t], mu_g, sqrt(sig_g2 + sig_y2), log = TRUE)
+    # loglike[t] <- log(mean(exp(w)))
+    # original formula, y_t is reduced when calculate log Bayes factor
+    loglike[t] <- log(mean(exp(w) / y[t])) 
     w1 <- exp(w - max(w))
     k <- sample(1:M, size = M, replace = TRUE, prob = w1)
-    S1 <- S[k]
-    E1 <- E[k]
-    I1 <- I[k]
-    R1 <- R[k]
-    sig2 <- sig2[k]
-    ss1 <- ss[k]
-    tau2 <- tau2[k]
-    vv1 <- vv[k]
+    S_t0 <- S_t[k]
+    E_t0 <- E_t[k]
+    I_t0 <- I_t[k]
+    R_t0 <- R_t[k]
+    sig_g2 <- sig_g2[k]
+    sig_y2 <- sig_y2[k]
+    b0_t0 <- b0_t[k]
+    d0_t0 <- d0_t[k]
     # Update I
-    g1 <- g[k]
-    var <- 1 / (1 / sig2 + 1 / tau2)
-    mean <- var * (yI[t] / sig2 + g1 / tau2)
-    x <- rnorm(M, mean, sqrt(var))
-    I <- I1 * (1 + x)
+    mu_g <- mu_g[k]
+    B <- 1 / (1 / sig_g2 + 1 / sig_y2)
+    b <- B * (yI[t] / sig_g2 + mu_g / sig_y2)
+    g_t <- rnorm(M, b, sqrt(B))
+    I_t <- I_t0 * (1 + g_t)
     # Update (E, R, S)
-    E <- beta * I1 * S1 + (1 - alpha) * E1
-    R <- R1 + gamma * I1
-    S <- 1 - I - R - E
+    E_t <- beta * I_t0 * S_t0 + (1 - alpha) * E_t0
+    R_t <- R_t0 + gamma * I_t0
+    S_t <- 1 - I_t - R_t - E_t
     # Offline sampling fixed parameters
-    ss <- ss1 + (yI[t] - x) ^ 2 / 2
-    sig2 <- 1 / rgamma(M, a0 + t / 2, ss)
-    vv <- vv1 + (x - g1) ^ 2 / 2
-    tau2 <- 1 / rgamma(M, c0 + t / 2, vv)
+    b0_t <- b0_t0 + (yI[t] - g_t) ^ 2 / 2
+    sig_g2 <- 1 / rgamma(M, a0 + t / 2, b0_t)
+    d0_t <- d0_t0 + (g_t - mu_g) ^ 2 / 2
+    sig_y2 <- 1 / rgamma(M, c0 + t / 2, d0_t)
   }
   return(loglike)
 }
