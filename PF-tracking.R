@@ -23,7 +23,7 @@ sdg <- 0.5 # sd of recovery parameter, \gamma
 
 # Sequential learning
 # -------------------
-M <- 1000000 # number of particles used at each iteration
+M <- 100000 # number of particles used at each iteration
 a <- 0.99 # Liu-West shrinkage factor
 set.seed(1321654)
 n <- length(y)
