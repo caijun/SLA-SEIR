@@ -1,3 +1,6 @@
+---
+output: pdf_document
+---
 # SLA-SEIR
 Sequential Learning Algorithm for state space SEIR epidemiological model
 
@@ -5,4 +8,4 @@ This is an optimized R code  for sequential learning algorithm for state space S
 
 After reviewing Dukic et al.'s code, I find that there are some problems:
 
-* In the implementation of `ar1plusnoise` function, Dukic et al. update $b_t$ by $b_t = (y_t - g_t)^2$ rather than by the iterative formula in their paper, $b_t = (y_t - g_t)^2/2$.
+* In the implementation of `ar1plusnoise` function, Dukic et al. update $b_t$ by $b_t = b_{t-1} + (y_t - g_t)^2$ rather than by the iterative formula in their paper, $b_t = b_{t-1} + (y_t - g_t)^2/2$.
