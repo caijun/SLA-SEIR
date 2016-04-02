@@ -18,11 +18,13 @@ After reviewing Dukic et al.'s code, I have some comments:
 
 Therefore, the absence of dividing 2 results in the **wrong** conclusion that "The AR(1) model predictions are not very accurate and reflect the inability of this simple model to capture the structure of the epidemic process well". The relative mean squared error of the AR(1) model versus the state-space SEIR model is 0.96 for the 2003/2004 and 1.31 for the 2008/2009 season, which suggests that the AR(1) model can also track the epidemic trajectory as well as the state-space SEIR model does, even better in the 2003/2004 season.
 
-* When calculating the relative mean squared error and plotting the Figure 10, Dukic et al. compare the 1-week-ahead predictions at week $t+1$ with the observations $y$ at week $t$ ($t=1,2,\cdots,35$), which is unreasonable. Further fixing this problem produces a Figure 10 as follows:
+* When calculating the relative mean squared error and plotting the Figure 10, Dukic et al. compare the 1-week-ahead predictions at week $t+1$ with the actual observations $y$ at week $t$ ($t=1,2,\cdots,35$), which is unreasonable. Further fixing this problem produces a Figure 10 as follows:
 
 ![Figure10](Figure10.pdf)
 
 As shown in above figure, the 1-week-ahead predictions from both the state-space SEIR model and AR(1) model suffer 1-week lag compared to the corresponding observations, which is also confirmed by Figure 8 in Dukic et al.'s paper. Moreover, both models fail to predict the epidemic peak. The relative mean squared error of the AR(1) model versus the state-space SEIR model is 1.08 for the 2003/2004 and 1.14 for the 2008/2009 season. This suggests that comparing to the simple state space AR(1) model, the state space SEIR model does't show much improvements in tracking the epidemic trajectory and predicting the epidemic peak.
+
+TODO: how to improve the state space model in order to make it able to predict the epidemic peak?
 
 ## Improvement
 
