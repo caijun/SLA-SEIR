@@ -59,8 +59,8 @@ loglike.ssm1 <- ssm1$loglike
 loglike.ssm2 <- ssm2$loglike
 pred.ssm1 <- ssm1$pred
 pred.ssm2 <- ssm2$pred
-ssm1 <- ssm1$qs
-ssm2 <- ssm2$qs
+qs.ssm1 <- ssm1$qs
+qs.ssm2 <- ssm2$qs
 
 # Comparison
 # ----------
@@ -124,5 +124,61 @@ lines(100 * mpred.ssm2[, 1], col = grey(0.65), lwd = 2, lty = 2)
 lines(100 * mpred.ssm2[, 2], col = grey(0.65), lwd = 2, type = "b", pch = 16)
 lines(100 * mpred.ssm2[, 3], col = grey(0.65), lwd = 2, lty = 2)
 points(y2[2:n2], pch = 16)
+
+dev.off()
+
+
+
+mg_t.pf1 <- t(apply(qs.pf1[10, , ], 2, quantile, c(.05, .5, .95)))
+mg_t.pf2 <- t(apply(qs.pf2[10, , ], 2, quantile, c(.05, .5, .95)))
+mg_t.ssm1 <- t(apply(qs.ssm1[5, , ], 2, quantile, c(.05, .5, .95)))
+mg_t.ssm2 <- t(apply(qs.ssm2[5, , ], 2, quantile, c(.05, .5, .95)))
+
+mI_t.pf1 <- t(apply(qs.pf1[2, , ], 2, quantile, c(.05, .5, .95)))
+mI_t.pf2 <- t(apply(qs.pf2[2, , ], 2, quantile, c(.05, .5, .95)))
+mI_t.ssm1 <- t(apply(qs.ssm1[6, , ], 2, quantile, c(.05, .5, .95)))
+mI_t.ssm2 <- t(apply(qs.ssm2[6, , ], 2, quantile, c(.05, .5, .95)))
+
+# Figure 9 of Dukic, Lopes and Polson (2012)
+pdf(file = "Figure9.pdf", width = 10, height = 7)
+par(cex.lab = 1.7, cex.axis = 1.3, cex.main = 1.9, mfrow = c(2, 2))
+
+plot(y1I[1:(n1 - 1)], ylim = c(-.5, .65), yaxs = "i", xaxs = "i", xaxt = "n",
+     xlab = "", ylab = "", axes = T)
+title(xlab = "", ylab = "Growth rate", main = "SEIR Model", cex.lab = 1.4)
+axis(1, at = tickind1, lab = ticklab1)
+lines(mg_t.pf1[, 1], col = grey(0.65), lty = 2)
+lines(mg_t.pf1[, 2], col = grey(0.65), type = "b", pch = 15, cex = .5)
+lines(mg_t.pf1[, 3], col = grey(0.65), lty = 2)
+points(y1I[1:(n1 - 1)], pch = 16)
+
+plot(y1I[1:(n1 - 1)], ylim = c(-.5, .65), yaxs = "i", xaxs = "i", xaxt = "n",
+     xlab = "", ylab = "", axes = T)
+title(xlab = "", ylab = "Growth rate", main = "AR(1) plus noise model",
+      cex.lab = 1.4)
+axis(1, at = tickind1, lab = ticklab1)
+lines(mg_t.ssm1[, 1], col = grey(0.65), lty = 2)
+lines(mg_t.ssm1[, 2], col = grey(0.65), type = "b", pch = 15, cex = .5)
+lines(mg_t.ssm1[, 3], col = grey(0.65), lty = 2)
+points(y1I[1:(n1 - 1)], pch = 16)
+
+# p(I_t|y_t) contains information from y_t, hence the index should start from 2.
+plot(y1[2:n1], ylim = c(0, 17), yaxs = "i", xaxs = "i", xaxt = "n",
+     xlab = "", ylab = "", axes = T)
+title(xlab = "", ylab = "Infected %", main = "", cex.lab = 1.4)
+axis(1, at = tickind1, lab = ticklab1)
+lines(100 * mI_t.pf1[, 1], col = grey(0.65), lty = 2)
+lines(100 * mI_t.pf1[, 2], col = grey(0.65), type = "b", pch = 15, cex = .5)
+lines(100 * mI_t.pf1[, 3], col = grey(0.65), lty = 2)
+points(y1[2:n1], pch = 16)
+
+plot(y1[2:n1], ylim = c(0, 17), yaxs = "i", xaxs = "i", xaxt = "n",
+     xlab = "", ylab = "", axes = T)
+title(xlab = "", ylab = "Infected %", main = "", cex.lab = 1.4)
+axis(1, at = tickind1, lab = ticklab1)
+lines(100 * mI_t.ssm1[, 1], col = grey(0.65), lty = 2)
+lines(100 * mI_t.ssm1[, 2], col = grey(0.65), type = "b", pch = 15, cex = .5)
+lines(100 * mI_t.ssm1[, 3], col = grey(0.65), lty = 2)
+points(y1[2:n1], pch = 16)
 
 dev.off()

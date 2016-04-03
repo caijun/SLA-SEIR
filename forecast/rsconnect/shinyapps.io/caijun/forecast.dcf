@@ -2,6 +2,8 @@ name: forecast
 account: caijun
 server: shinyapps.io
 appId: 90630
-bundleId: 403766
+bundleId: 409221
 url: https://caijun.shinyapps.io/forecast/
-when: 1459008854.97748
+when: 1459669489.25696
+asMultiple: FALSE
+asStatic: FALSE
