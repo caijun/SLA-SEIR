@@ -129,6 +129,7 @@ dev.off()
 
 
 
+# Figure 9 of Dukic, Lopes and Polson (2012)
 mg_t.pf1 <- t(apply(qs.pf1[10, , ], 2, quantile, c(.05, .5, .95)))
 mg_t.pf2 <- t(apply(qs.pf2[10, , ], 2, quantile, c(.05, .5, .95)))
 mg_t.ssm1 <- t(apply(qs.ssm1[5, , ], 2, quantile, c(.05, .5, .95)))
@@ -139,7 +140,6 @@ mI_t.pf2 <- t(apply(qs.pf2[2, , ], 2, quantile, c(.05, .5, .95)))
 mI_t.ssm1 <- t(apply(qs.ssm1[6, , ], 2, quantile, c(.05, .5, .95)))
 mI_t.ssm2 <- t(apply(qs.ssm2[6, , ], 2, quantile, c(.05, .5, .95)))
 
-# Figure 9 of Dukic, Lopes and Polson (2012)
 pdf(file = "Figure9.pdf", width = 10, height = 7)
 par(cex.lab = 1.7, cex.axis = 1.3, cex.main = 1.9, mfrow = c(2, 2))
 
