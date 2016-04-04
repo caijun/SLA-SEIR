@@ -1,3 +1,4 @@
+# random number generated from truncated normal distribution
 rtnorm <- function(N, mu, sd) {
   u <- runif(N)
   mu + sd * qnorm(u + (1 - u) * pnorm(-mu / sd))
