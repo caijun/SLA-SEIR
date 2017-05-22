@@ -84,8 +84,8 @@ tickind2 <- trunc(seq(246, 314, length = 4)) - 244 - 1
 ticklab2 <- c("6/8/08", "11/9/08", "4/19/09", "9/27/09")
 
 # Figure 10 of Dukic, Lopes and Polson (2012)
-# pdf(file = "Figure10.pdf", width = 10, height = 7)
-png(file = "Figure10.png", width = 10, height = 7, units = "in", res = 300)
+# pdf(file = "fig/Figure10.pdf", width = 10, height = 7)
+png(file = "fig/Figure10.png", width = 10, height = 7, units = "in", res = 300)
 par(cex.lab = 1.7, cex.axis = 1.3, cex.main = 1.9, mfrow = c(2, 2))
 
 plot(y1[2:n1], ylim = c(0, 20), pch = 15, yaxs = "i", xaxs = "i", xaxt = "n",
@@ -141,8 +141,8 @@ mI_t.pf2 <- t(apply(qs.pf2[2, , ], 2, quantile, c(.05, .5, .95)))
 mI_t.ssm1 <- t(apply(qs.ssm1[6, , ], 2, quantile, c(.05, .5, .95)))
 mI_t.ssm2 <- t(apply(qs.ssm2[6, , ], 2, quantile, c(.05, .5, .95)))
 
-# pdf(file = "Figure9.pdf", width = 10, height = 7)
-png(file = "Figure9.png", width = 10, height = 7, units = "in", res = 300)
+# pdf(file = "fig/Figure9.pdf", width = 10, height = 7)
+png(file = "fig/Figure9.png", width = 10, height = 7, units = "in", res = 300)
 par(cex.lab = 1.7, cex.axis = 1.3, cex.main = 1.9, mfrow = c(2, 2))
 
 plot(y1I[1:(n1 - 1)], ylim = c(-.5, .65), yaxs = "i", xaxs = "i", xaxt = "n",

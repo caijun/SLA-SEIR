@@ -37,9 +37,9 @@ Improvements
 
 -   Dukic et al.'s code provides two methods to calculate log Bayes factor. One is using `PFlike` function, which is used in Figure 5 and 6 in their paper. The other is provided in `PF1` function, which contains the particle replenishing process. I use the latter to reproduce the log Bayes factor panel in Figure 5 and 6. The results are as follows:
 
-![Reproduction of Figure 5](fig/Figure5.pdf)
+![Reproduction of Figure 5 using PF1 function](fig/Figure5.png)
 
-![Reproduction of Figure 6](fig/Figure6.pdf)
+![Reproduction of Figure 6 using PF1 function](fig/Figure6.png)
 
 As shown in the reproductions of log Bayes factor plot in Figure 5 and 6, calculating log Bayes factor with particle replenishing process is more rensonable as it more sensitive to the variations in transmission parameter *β*. For example, in the Figure 5, while the transmission began to increase sharply around 12/14/03, the log Bayes factor began to decrease, indicating less evidence in favor of a seasonal epidemic. The same phenomenon can be observed in Figure 6.
 

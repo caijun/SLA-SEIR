@@ -1,13 +1,13 @@
 rm(list = ls())
 setwd("~/Documents/github/SLA-SEIR")
 
-source("PF-subroutines.R")
+source("src/PF-subroutines.R")
 
 # Data set
 # --------
 data <- read.table("Google-CDC-US-Feb2010.txt", header = TRUE)
-# y <- data[1:36, 5] # y is ILI percentage (%) of 2003/2004 season
-y <- data[245:314, 5] # y is ILI percentage (%) of 2008/2009 season
+y <- data[1:36, 5] # y is ILI percentage (%) of 2003/2004 season
+# y <- data[245:314, 5] # y is ILI percentage (%) of 2008/2009 season
 
 # Prior hyperparameters
 # ---------------------
@@ -41,17 +41,19 @@ clbf <- cumsum(loglike1 - loglike2) # cummulative log Bayesian Factor
 names <- c("Transmission", "Latency", "Recovery", "Obs St Dev", "Evo St Dev")
 # only from the 2nd week, the observed growth rate of the infectious population
 # can be calculated.
-# # tick index and label for 2003/2004 season
-# tickind <- trunc(seq(2, 36, length = 4)) - 1
-# ticklab <- c("10/5/03", "12/21/03", "3/7/04", "5/30/04")
-# tick index and label for 2008/2009 season
-tickind <- trunc(seq(246, 314, length = 4)) - 244 - 1
-ticklab <- c("6/8/08", "11/9/08", "4/19/09", "9/27/09")
+# tick index and label for 2003/2004 season
+tickind <- trunc(seq(2, 36, length = 4)) - 1
+ticklab <- c("10/5/03", "12/21/03", "3/7/04", "5/30/04")
+# # tick index and label for 2008/2009 season
+# tickind <- trunc(seq(246, 314, length = 4)) - 244 - 1
+# ticklab <- c("6/8/08", "11/9/08", "4/19/09", "9/27/09")
 
 # Figure 5 of Dukic, Lopes and Polson (2012)
-# pdf(file = "Figure5.pdf", width = 20, height = 10)
-# Figure 6 of Dukic, Lopes and Polson (2012)
-pdf(file = "Figure6.pdf", width = 20, height = 10)
+# pdf(file = "fig/Figure5.pdf", width = 20, height = 10)
+png(file = "fig/Figure5.png", width = 20, height = 10, units = "in", res = 300)
+# # Figure 6 of Dukic, Lopes and Polson (2012)
+# # pdf(file = "fig/Figure6.pdf", width = 20, height = 10)
+# png(file = "fig/Figure6.png", width = 20, height = 10, units = "in", res = 300)
 par(mar = c(5, 5, 4, 3), cex.lab = 3, cex.axis = 1.6, cex.main = 2.5,
     mfrow = c(2, 4))
 
