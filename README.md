@@ -12,13 +12,13 @@ Problems
 
 -   In the implementation of `ar1plusnoise` function, Dukic et al. update *b*<sub>*t*</sub> by *b*<sub>*t*</sub> = *b*<sub>*t* − 1</sub> + (*y*<sub>*t*</sub> − *g*<sub>*t*</sub>)<sup>2</sup> rather than by the iterative formula presented in their paper, *b*<sub>*t*</sub> = *b*<sub>*t* − 1</sub> + (*y*<sub>*t*</sub> − *g*<sub>*t*</sub>)<sup>2</sup>/2. Fixing this problem produces a Figure 10 as follows:
 
-![Reproduction of Figure 10 with dividing 2](fig/Figure10_divide2.pdf)
+![Reproduction of Figure 10 with dividing 2](fig/Figure10_divide2.png)
 
 Therefore, the absence of dividing 2 results in the **wrong** conclusion that "The AR(1) model predictions are not very accurate and reflect the inability of this simple model to capture the structure of the epidemic process well". Now the relative mean squared error (RMSE) of the AR(1) model versus the state-space SEIR model is 0.96 for the 2003/2004 and 1.31 for the 2008/2009 season using the random number seed provided by Dukic et al., which suggests that the AR(1) model can also track the epidemic trajectory as well as the state-space SEIR model does, even better in the 2003/2004 season.
 
 -   When calculating the relative mean squared error and plotting the Figure 10, Dukic et al. compare the 1-week-ahead predictions at week *t* + 1 with the actual observations *y* at week *t* (*t* = 1, 2, ⋯, 35), which is unreasonable. Further fixing this problem produces a Figure 10 as follows:
 
-![Reproduction of Figure 10](fig/Figure10.png)
+![Reproduction of Figure 10 with dividing 2 and fixing time shifting](fig/Figure10.png)
 
 As shown in above figure, the 1-week-ahead predictions from both the state-space SEIR model and AR(1) model suffer 1-week lag compared to the corresponding observations, which is also confirmed by Figure 8 in Dukic et al.'s paper. It is obvious that both models fail to predict the epidemic peak. I also develop a shiny application (<https://caijun.shinyapps.io/forecast/>) to illustrate the correct comparing process between 1-week-ahead predictions and the actual observations.
 
